@@ -1,0 +1,30 @@
+identity:
+  author: aishorty
+  name: shorty
+  label:
+    en_US: Shorty
+  description:
+    en_US: Summarize YouTube videos and web pages, and transcribe audio and video, with Shorty.
+  icon: icon.png
+  tags:
+  - videos
+  - productivity
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API Key
+    placeholder:
+      en_US: Enter your Shorty API key (shk_live_...)
+    help:
+      en_US: Create a key in Shorty under Settings, API Keys.
+    url: https://aishorty.com/settings
+tools:
+- tools/summarize_youtube.yaml
+- tools/summarize_page.yaml
+- tools/transcribe.yaml
+- tools/get_job_result.yaml
+extra:
+  python:
+    source: provider/shorty.py
