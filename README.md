@@ -40,3 +40,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt pytest
 ```
 
 Package with Dify's plugin CLI: `dify plugin package .`
+
+## License
+
+MIT, see [LICENSE](LICENSE).
