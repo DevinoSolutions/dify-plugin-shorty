@@ -52,11 +52,11 @@ parameters:
 - name: max_wait
   type: number
   required: false
-  default: 480
+  default: 360
   label:
     en_US: Max wait (seconds)
   human_description:
-    en_US: How long to wait for Shorty to finish before returning a job id to check later. Up to 540.
+    en_US: How long to wait for Shorty to finish before returning a job id to check later. Up to 360.
   form: form
 extra:
   python:

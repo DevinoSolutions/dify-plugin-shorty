@@ -13,7 +13,7 @@
 | **Transcribe Audio or Video** | The text and timed segments of an audio or video file from a direct link (.mp3, .wav, .mp4 and so on). YouTube links are not transcribed; use the summarize tool for those. |
 | **Get Job Result** | Fetches the result of a job that was still running when another tool returned. |
 
-Shorty works in jobs. Each tool starts a job, waits for it (up to the "Max wait" setting, 240 seconds for summaries and 480 for transcripts by default) and returns the result as Markdown or text plus a JSON message for workflow variables. If the job is not finished in time, the tool returns the job id and you can fetch the result later with Get Job Result.
+Shorty works in jobs. Each tool starts a job, waits for it (up to the "Max wait" setting, 240 seconds for summaries and 360 for transcripts by default, at most 360) and returns the result as Markdown or text plus a JSON message for workflow variables. If the job is not finished in time, the tool returns the job id and you can fetch the result later with Get Job Result.
 
 ## Setup
 

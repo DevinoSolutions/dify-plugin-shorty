@@ -15,12 +15,23 @@ API_BASE = "https://aishorty.com/v1"
 USER_AGENT = "shorty-dify-plugin/0.1.0"
 DEFAULT_TIMEOUT = 60
 POLL_INTERVAL = 3
+# Dify stops a tool call after MAX_REQUEST_TIMEOUT (600 s). Worst case is this wait,
+# one sleep, one poll that is still running at the deadline (60 s) and two result
+# fetches (2 x 60 s): 360 + 3 + 60 + 120 = 543 s.
+MAX_WAIT = 360
 DONE = {"success", "completed"}
 FAILED = {"error", "failed", "cancelled", "canceled"}
 
 
 class ShortyError(Exception):
-    """An error message that is safe to show to the user and to the model. It never contains the key."""
+    """An error message that is safe to show to the user and to the model. It never contains the key.
+
+    retryable is True for a rate limit, a server error or a network failure.
+    """
+
+    def __init__(self, message: str, retryable: bool = False):
+        super().__init__(message)
+        self.retryable = retryable
 
 
 class JobPending(Exception):
@@ -82,11 +93,14 @@ def request(
             method, API_BASE + path, params=params, json=body, headers=headers, timeout=timeout
         )
     except requests.Timeout:
-        raise ShortyError("Shorty did not answer in time. Try again.") from None
+        raise ShortyError("Shorty did not answer in time. Try again.", retryable=True) from None
     except requests.RequestException:
-        raise ShortyError("Could not connect to aishorty.com. Check the network.") from None
+        raise ShortyError("Could not connect to aishorty.com. Check the network.", retryable=True) from None
     if response.status_code >= 400:
-        raise ShortyError(_error_message(response).replace(secret, "***"))
+        status = response.status_code
+        raise ShortyError(
+            _error_message(response).replace(secret, "***"), retryable=status == 429 or status >= 500
+        )
     return response
 
 
@@ -118,7 +132,7 @@ def wait_seconds(params: dict, default: int) -> int:
         value = int(params.get("max_wait") or default)
     except (TypeError, ValueError):
         value = default
-    return max(10, min(value, 540))
+    return max(10, min(value, MAX_WAIT))
 
 
 def start_summary(key: Any, source: str, url: str, language: str) -> dict:
@@ -142,16 +156,35 @@ def get_job(key: Any, job_id: str) -> dict:
     return body_json(request("GET", "/jobs/" + quote(job_id, safe=""), key))
 
 
+def failed_message(job: dict, status: str) -> str:
+    detail = str(job.get("error") or "").strip()
+    message = f"Shorty could not process this link (status: {status}). Check the link or try another."
+    if detail and detail.lower() != status:
+        message += f" Details: {detail[:300]}"
+    return message
+
+
 def wait_for_job(key: Any, job_id: str, max_wait: int) -> dict:
-    """Poll the job until it succeeds. Raises ShortyError if it fails and JobPending if time runs out."""
+    """Poll the job until it succeeds.
+
+    Raises ShortyError if the job fails and JobPending if time runs out. A transient
+    error while polling (429, 5xx, network) is retried until the deadline; if the
+    last poll still failed, the job is reported as pending so the id is not lost.
+    """
     deadline = time.monotonic() + max_wait
+    status = "unknown"
     while True:
-        job = get_job(key, job_id)
-        status = str(job.get("status") or "").lower()
-        if status in DONE:
-            return job
-        if status in FAILED:
-            raise ShortyError(f"The Shorty job failed: {str(job.get('error') or status)[:300]}")
+        try:
+            job = get_job(key, job_id)
+        except ShortyError as error:
+            if not error.retryable:
+                raise
+        else:
+            status = str(job.get("status") or "").lower()
+            if status in DONE:
+                return job
+            if status in FAILED:
+                raise ShortyError(failed_message(job, status))
         if time.monotonic() >= deadline:
             raise JobPending(job_id, status)
         time.sleep(POLL_INTERVAL)
