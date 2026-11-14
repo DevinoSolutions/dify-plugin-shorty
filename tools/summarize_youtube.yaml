@@ -1,0 +1,40 @@
+identity:
+  name: summarize_youtube
+  author: aishorty
+  label:
+    en_US: Summarize YouTube Video
+description:
+  human:
+    en_US: Summarize a YouTube video into a structured summary with key points.
+  llm: Summarizes a YouTube video. Returns the summary as Markdown with a title and sections. Takes a minute or two for new videos.
+parameters:
+- name: url
+  type: string
+  required: true
+  label:
+    en_US: YouTube URL
+  human_description:
+    en_US: The full YouTube video link, as copied from the browser address bar.
+  llm_description: The full YouTube video link, as copied from the browser address bar.
+  form: llm
+- name: language
+  type: string
+  required: false
+  default: english
+  label:
+    en_US: Language
+  human_description:
+    en_US: Language of the summary, for example english, french or spanish. The default is english.
+  form: form
+- name: max_wait
+  type: number
+  required: false
+  default: 240
+  label:
+    en_US: Max wait (seconds)
+  human_description:
+    en_US: How long to wait for Shorty to finish before returning a job id to check later. Up to 540.
+  form: form
+extra:
+  python:
+    source: tools/summarize_youtube.py

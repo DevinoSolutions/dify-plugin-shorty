@@ -1,0 +1,63 @@
+identity:
+  name: transcribe
+  author: aishorty
+  label:
+    en_US: Transcribe Audio or Video
+description:
+  human:
+    en_US: Transcribe a direct audio or video file link to text with timestamps.
+  llm: Transcribes an audio or video file from a direct link (for example an .mp3, .wav or .mp4 URL). Returns the transcript text and timed segments. YouTube links are not supported; use the summarize tool for those.
+parameters:
+- name: url
+  type: string
+  required: true
+  label:
+    en_US: Media URL
+  human_description:
+    en_US: A direct link to an audio or video file, for example https://example.com/episode.mp3.
+  llm_description: A direct link to an audio or video file, for example https://example.com/episode.mp3.
+  form: llm
+- name: language
+  type: string
+  required: false
+  label:
+    en_US: Language
+  human_description:
+    en_US: Spoken language, for example english or french. The default is english.
+  form: form
+- name: output_language
+  type: select
+  required: false
+  label:
+    en_US: Output language
+  options:
+  - value: en
+    label:
+      en_US: English
+  - value: es
+    label:
+      en_US: Spanish
+  - value: fr
+    label:
+      en_US: French
+  - value: de
+    label:
+      en_US: German
+  - value: pt
+    label:
+      en_US: Portuguese
+  human_description:
+    en_US: Deliver the transcript in this language. English is free; other languages need Shorty Premium. Leave empty to keep the spoken language.
+  form: form
+- name: max_wait
+  type: number
+  required: false
+  default: 480
+  label:
+    en_US: Max wait (seconds)
+  human_description:
+    en_US: How long to wait for Shorty to finish before returning a job id to check later. Up to 540.
+  form: form
+extra:
+  python:
+    source: tools/transcribe.py

@@ -1,0 +1,40 @@
+identity:
+  name: summarize_page
+  author: aishorty
+  label:
+    en_US: Summarize Web Page
+description:
+  human:
+    en_US: Summarize a web page or online article from its URL.
+  llm: Summarizes a public web page or article. Returns the summary as Markdown with a title and sections.
+parameters:
+- name: url
+  type: string
+  required: true
+  label:
+    en_US: Page URL
+  human_description:
+    en_US: The full link of a public web page or article.
+  llm_description: The full link of a public web page or article.
+  form: llm
+- name: language
+  type: string
+  required: false
+  default: english
+  label:
+    en_US: Language
+  human_description:
+    en_US: Language of the summary, for example english, french or spanish. The default is english.
+  form: form
+- name: max_wait
+  type: number
+  required: false
+  default: 240
+  label:
+    en_US: Max wait (seconds)
+  human_description:
+    en_US: How long to wait for Shorty to finish before returning a job id to check later. Up to 540.
+  form: form
+extra:
+  python:
+    source: tools/summarize_page.py

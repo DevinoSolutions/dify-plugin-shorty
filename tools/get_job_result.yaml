@@ -1,0 +1,22 @@
+identity:
+  name: get_job_result
+  author: aishorty
+  label:
+    en_US: Get Job Result
+description:
+  human:
+    en_US: Get the result of a Shorty job that was still running when the other tool returned.
+  llm: Fetches the result of a Shorty job by its job id. Use it when a summarize or transcribe tool answered that the job is still running.
+parameters:
+- name: job_id
+  type: string
+  required: true
+  label:
+    en_US: Job ID
+  human_description:
+    en_US: The job id returned by a Shorty tool that did not finish in time.
+  llm_description: The job id returned by a Shorty tool that did not finish in time.
+  form: llm
+extra:
+  python:
+    source: tools/get_job_result.py
