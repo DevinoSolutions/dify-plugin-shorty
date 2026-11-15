@@ -16,8 +16,8 @@ USER_AGENT = "shorty-dify-plugin/0.1.0"
 DEFAULT_TIMEOUT = 60
 POLL_INTERVAL = 3
 # Dify stops a tool call after MAX_REQUEST_TIMEOUT (600 s). Worst case is this wait,
-# one sleep, one poll that is still running at the deadline (60 s) and two result
-# fetches (2 x 60 s): 360 + 3 + 60 + 120 = 543 s.
+# one sleep, one poll that is still running at the deadline (60 s), the start POST and
+# one result fetch (2 x 60 s): 360 + 3 + 60 + 120 = 543 s.
 MAX_WAIT = 360
 DONE = {"success", "completed"}
 FAILED = {"error", "failed", "cancelled", "canceled"}
